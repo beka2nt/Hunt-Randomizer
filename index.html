@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hunt: Showdown 1896 Randomizer</title>
+    <!-- 引入西部风格字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Rye&family=Roboto+Mono:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-panel: #141414;
+            --border-color: #3d3d3d;
+            --hunt-red: #8a1c1c;
+            --hunt-red-hover: #b22222;
+            --text-main: #e0e0e0;
+            --text-muted: #888;
+            --gold-accent: #cdbfa0;
+            --slot-bg: #0f0f0f;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* 标题样式 */
+        .header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--hunt-red);
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-family: 'Rye', serif;
+            font-size: 42px;
+            margin: 0;
+            color: var(--text-main);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+            text-align: center;
+        }
+
+        .lang-btn {
+            margin-top: 15px;
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-muted);
+            padding: 5px 15px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Roboto Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        .lang-btn:hover {
+            border-color: var(--hunt-red);
+            color: var(--hunt-red);
+        }
+
+        /* 主容器 */
+        .main-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            width: 100%;
+            max-width: 1000px;
+            justify-content: center;
+        }
+
+        /* 控制面板 */
+        .controls {
+            flex: 1;
+            min-width: 300px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            height: fit-content;
+        }
+
+        .control-group {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        
+        .control-group:last-of-type {
+            border-bottom: none;
+        }
+
+        .control-title {
+            font-family: 'Rye', serif;
+            color: var(--gold-accent);
+            margin-bottom: 15px;
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+
+        /* 自定义复选框样式 */
+        label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 15px;
+            color: #ccc;
+            transition: color 0.2s;
+        }
+
+        label:hover {
+            color: #fff;
+        }
+
+        input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #555;
+            background: #111;
+            margin-right: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        input[type="checkbox"]:checked {
+            background: var(--hunt-red);
+            border-color: var(--hunt-red);
+        }
+
+        input[type="checkbox"]:checked::after {
+            content: '✕';
+            color: white;
+            font-size: 14px;
+            position: absolute;
+            top: -1px;
+            left: 2px;
+            font-weight: bold;
+        }
+        
+        input[type="checkbox"]:disabled {
+            border-color: #333;
+            background: #222;
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* 生成按钮 */
+        button#generateBtn {
+            background: linear-gradient(180deg, var(--hunt-red) 0%, #5e0e0e 100%);
+            color: white;
+            border: 1px solid #ff4444;
+            padding: 15px;
+            font-size: 20px;
+            font-family: 'Rye', serif;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 0 #3b0505;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        button#generateBtn:hover {
+            filter: brightness(1.2);
+        }
+
+        button#generateBtn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #3b0505;
+        }
+
+        button:disabled {
+            filter: grayscale(1);
+            cursor: not-allowed;
+        }
+
+        /* 结果显示区域 */
+        .loadout-container {
+            flex: 1.5;
+            min-width: 340px;
+            display: grid;
+            gap: 15px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section {
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            padding: 0;
+            position: relative;
+        }
+
+        .section-header {
+            background: #1f1f1f;
+            padding: 8px 15px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border-color);
+            letter-spacing: 1px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .section-content {
+            padding: 15px;
+        }
+
+        .item {
+            background: var(--slot-bg);
+            border-left: 3px solid #444;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            font-size: 18px;
+            font-family: 'Georgia', serif;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .item:last-child {
+            margin-bottom: 0;
+        }
+
+        .item:hover {
+            border-left-color: var(--hunt-red);
+            background: #1a1a1a;
+            transform: translateX(5px);
+        }
+
+        /* 特殊文字颜色 */
+        .quartermaster {
+            color: var(--gold-accent);
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(205, 191, 160, 0.2);
+        }
+
+        .sub-text {
+            color: #555;
+            font-style: italic;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .slot-name {
+            font-size: 11px;
+            color: var(--hunt-red);
+            margin-bottom: 4px;
+            display: block;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* 页脚样式 */
+        .footer {
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .footer-link {
+            color: #666;
+            text-decoration: none;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-link:hover {
+            color: var(--hunt-red);
+            text-shadow: 0 0 8px rgba(180, 50, 50, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .separator {
+            color: #333;
+        }
+
+    </style>
+</head>
+<body>
+    
+    <div class="header">
+        <h1>HUNT: SHOWDOWN 1896</h1>
+        <button class="lang-btn" onclick="toggleLanguage()">Language: 中文 / EN</button>
+    </div>
+
+    <div class="main-wrapper">
+        <!-- 左侧：控制面板 -->
+        <div class="controls">
+            <div class="control-group">
+                <div class="control-title" id="lbl_module">生成模块</div>
+                <label><input type="checkbox" id="doWeapons" checked disabled> <span id="lbl_weap">随机武器</span></label>
+                <label><input type="checkbox" id="doTools" checked> <span id="lbl_tool">随机工具</span></label>
+                <label><input type="checkbox" id="doConsumables" checked> <span id="lbl_cons">随机消耗品</span></label>
+            </div>
+
+            <div class="control-group">
+                <div class="control-title" id="lbl_rule">规则约束</div>
+                <label><input type="checkbox" id="allowQuartermaster" checked> <span id="lbl_qm">启用"军需官"</span></label>
+                <label><input type="checkbox" id="forceMedkit" checked> <span id="lbl_med">必带急救包</span></label>
+                <label><input type="checkbox" id="forceMelee" checked> <span id="lbl_mel">必带近战工具</span></label>
+            </div>
+
+            <button id="generateBtn" onclick="generateLoadout()" disabled>Initialize...</button>
+        </div>
+
+        <!-- 右侧：结果展示 -->
+        <div class="loadout-container" id="results" style="display:none;">
+            <!-- 特质 -->
+            <div class="section">
+                <div class="section-header">
+                    <span id="h_trait">TRAIT</span>
+                    <span>///</span>
+                </div>
+                <div class="section-content">
+                    <div id="traitResult" class="item" style="border:none; padding: 5px 0;"></div>
+                </div>
+            </div>
+            
+            <!-- 武器 -->
+            <div class="section">
+                <div class="section-header">
+                    <span id="h_weap">WEAPONS</span>
+                    <span>///</span>
+                </div>
+                <div class="section-content">
+                    <span class="slot-name">Large Slot</span>
+                    <div id="primaryWeapon" class="item"></div>
+                    
+                    <div style="height: 15px;"></div> <!-- 间隔 -->
+
+                    <span class="slot-name" id="secSlotLabel">Small Slot</span>
+                    <div id="secondaryWeapon" class="item"></div>
+                </div>
+            </div>
+
+            <!-- 工具 -->
+            <div class="section">
+                <div class="section-header">
+                    <span id="h_tool">TOOLS</span>
+                    <span>///</span>
+                </div>
+                <div class="section-content" id="toolsList"></div>
+            </div>
+
+            <!-- 消耗品 -->
+            <div class="section">
+                <div class="section-header">
+                    <span id="h_cons">CONSUMABLES</span>
+                    <span>///</span>
+                </div>
+                <div class="section-content" id="consumablesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 页脚区域 -->
+    <footer class="footer">
+        <a href="https://github.com/beka2nt" target="_blank" class="footer-link">
+            <span>GITHUB @beka2nt</span>
+        </a>
+        
+        <span class="separator">///</span>
+        
+        <a href="https://space.bilibili.com/5129008" target="_blank" class="footer-link">
+            <span>BILIBILI @5129008</span>
+        </a>
+    </footer>
+
+    <!-- 引用你的逻辑文件 -->
+    <script src="logic.js"></script>
+</body>
+</html>
