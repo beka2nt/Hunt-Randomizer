@@ -30,7 +30,7 @@
 *   **中英双语切换**：一键切换界面语言，方便国内外玩家。
 *   **智能生成逻辑**：
     *   支持 **“军需官” (Quartermaster)** 特质逻辑（自动适配 大栏位 + 中栏位武器）。
-    *   可设置 **强制携带** 急救包和近战工具（避免“坐牢”配装）。
+    *   可设置 **强制携带** 急救包和近战工具。
 *   **高度自定义**：可以选择是否随机生成工具或消耗品。
 
 ### 🛠️ 技术栈
@@ -39,7 +39,7 @@
 *   GitHub Pages 部署
 
 ### 🤝 参与贡献
-如果你发现了 BUG，或者有新的功能建议（比如增加价格计算、传奇皮肤支持等），欢迎在 [Issues](https://github.com/beka2nt/Hunt-Randomizer/issues) 中提出！
+如果你发现了 BUG，或者有新的功能建议（比如增加价格计算、皮肤支持等），欢迎在 [Issues](https://github.com/beka2nt/Hunt-Randomizer/issues) 中提出！
 
 **如果你觉得这个工具有趣，请点击右上角的 ⭐ Star 支持一下！**
 
@@ -66,7 +66,7 @@ A simple web-based tool designed for *Hunt: Showdown 1896*. It generates random 
 *   Deployed via GitHub Pages
 
 ### 🤝 Contribution
-If you encounter any bugs or have suggestions (e.g., price calculation, legendary skins), please feel free to open an [Issue](https://github.com/beka2nt/Hunt-Randomizer/issues).
+If you encounter any bugs or have suggestions (e.g., price calculation, skins), please feel free to open an [Issue](https://github.com/beka2nt/Hunt-Randomizer/issues).
 
 **If you enjoy this tool, please give it a ⭐ Star!**
 
