@@ -17,6 +17,7 @@
             --text-muted: #888;
             --gold-accent: #cdbfa0;
             --slot-bg: #0f0f0f;
+            --money-green: #85bb65; /* 钞票绿 */
         }
 
         body {
@@ -162,6 +163,30 @@
             opacity: 0.5;
         }
 
+        /* 下拉菜单样式 */
+        select {
+            width: 100%;
+            padding: 10px;
+            background-color: #111;
+            color: var(--text-main);
+            border: 1px solid #555;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23b22222%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 12px auto;
+            border-radius: 4px;
+            transition: border-color 0.3s;
+        }
+
+        select:hover, select:focus {
+            border-color: var(--hunt-red);
+            outline: none;
+        }
+
         /* 生成按钮 */
         button#generateBtn {
             background: linear-gradient(180deg, var(--hunt-red) 0%, #5e0e0e 100%);
@@ -238,6 +263,7 @@
             font-size: 18px;
             font-family: 'Georgia', serif;
             display: flex;
+            justify-content: space-between; /* 名字和价格两端对齐 */
             align-items: center;
             transition: all 0.2s;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
@@ -251,6 +277,13 @@
             border-left-color: var(--hunt-red);
             background: #1a1a1a;
             transform: translateX(5px);
+        }
+        
+        /* 价格标签样式 */
+        .price-tag {
+            font-family: 'Roboto Mono', monospace;
+            font-size: 14px;
+            color: #666;
         }
 
         /* 特殊文字颜色 */
@@ -275,6 +308,32 @@
             display: block;
             text-transform: uppercase;
             font-weight: bold;
+        }
+
+        /* 总价格面板样式 */
+        .total-panel {
+            background: #111;
+            border: 1px solid var(--hunt-red);
+            padding: 15px;
+            text-align: right;
+            font-family: 'Rye', serif;
+            font-size: 24px;
+            color: var(--text-main);
+            box-shadow: 0 0 15px rgba(138, 28, 28, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 14px;
+            font-family: 'Roboto Mono', monospace;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .total-value {
+            color: var(--money-green);
         }
 
         /* 页脚样式 */
@@ -324,6 +383,7 @@
     <div class="main-wrapper">
         <!-- 左侧：控制面板 -->
         <div class="controls">
+            <!-- 模块 1：生成内容 -->
             <div class="control-group">
                 <div class="control-title" id="lbl_module">生成模块</div>
                 <label><input type="checkbox" id="doWeapons" checked disabled> <span id="lbl_weap">随机武器</span></label>
@@ -331,9 +391,21 @@
                 <label><input type="checkbox" id="doConsumables" checked> <span id="lbl_cons">随机消耗品</span></label>
             </div>
 
+            <!-- 模块 2：栏位配置 -->
             <div class="control-group">
-                <div class="control-title" id="lbl_rule">规则约束</div>
-                <label><input type="checkbox" id="allowQuartermaster" checked> <span id="lbl_qm">启用"军需官"</span></label>
+                <div class="control-title" id="lbl_slot_config">武器槽位组合</div>
+                <select id="slotConfig">
+                    <option value="3+1" id="opt_31">3 + 1 (大槽 + 小槽)</option>
+                    <option value="3+2" id="opt_32">3 + 2 (大槽 + 中槽 / 军需官)</option>
+                    <option value="2+2" id="opt_22">2 + 2 (中槽 + 中槽)</option>
+                    <option value="2+1" id="opt_21">2 + 1 (中槽 + 小槽)</option>
+                    <option value="1+1" id="opt_11">1 + 1 (小槽 + 小槽)</option>
+                </select>
+            </div>
+
+            <!-- 模块 3：其他规则 -->
+            <div class="control-group">
+                <div class="control-title" id="lbl_rule">其他规则</div>
                 <label><input type="checkbox" id="forceMedkit" checked> <span id="lbl_med">必带急救包</span></label>
                 <label><input type="checkbox" id="forceMelee" checked> <span id="lbl_mel">必带近战工具</span></label>
             </div>
@@ -361,12 +433,12 @@
                     <span>///</span>
                 </div>
                 <div class="section-content">
-                    <span class="slot-name">Large Slot</span>
+                    <span class="slot-name" id="primarySlotLabel">Large Slot</span>
                     <div id="primaryWeapon" class="item"></div>
                     
-                    <div style="height: 15px;"></div> <!-- 间隔 -->
+                    <div style="height: 15px;"></div> 
 
-                    <span class="slot-name" id="secSlotLabel">Small Slot</span>
+                    <span class="slot-name" id="secondarySlotLabel">Small Slot</span>
                     <div id="secondaryWeapon" class="item"></div>
                 </div>
             </div>
@@ -388,23 +460,25 @@
                 </div>
                 <div class="section-content" id="consumablesList"></div>
             </div>
+
+            <!-- 总价格 (新增) -->
+            <div class="total-panel">
+                <span class="total-label" id="lbl_total">TOTAL COST</span>
+                <span class="total-value" id="totalCostValue">$0</span>
+            </div>
         </div>
     </div>
 
-    <!-- 页脚区域 -->
     <footer class="footer">
         <a href="https://github.com/beka2nt" target="_blank" class="footer-link">
             <span>GITHUB @beka2nt</span>
         </a>
-        
         <span class="separator">///</span>
-        
         <a href="https://space.bilibili.com/5129008" target="_blank" class="footer-link">
             <span>BILIBILI @5129008</span>
         </a>
     </footer>
 
-    <!-- 引用你的逻辑文件 -->
     <script src="logic.js"></script>
 </body>
 </html>
