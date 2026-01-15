@@ -17,7 +17,7 @@
             --text-muted: #888;
             --gold-accent: #cdbfa0;
             --slot-bg: #0f0f0f;
-            --money-green: #85bb65; /* 钞票绿 */
+            --money-green: #85bb65;
         }
 
         body {
@@ -113,7 +113,7 @@
             letter-spacing: 1px;
         }
 
-        /* 自定义复选框样式 */
+        /* 复选框样式 */
         label {
             display: flex;
             align-items: center;
@@ -139,6 +139,7 @@
             position: relative;
             cursor: pointer;
             transition: all 0.2s;
+            flex-shrink: 0; /* 防止被挤压 */
         }
 
         input[type="checkbox"]:checked {
@@ -161,30 +162,6 @@
             background: #222;
             cursor: not-allowed;
             opacity: 0.5;
-        }
-
-        /* 下拉菜单样式 */
-        select {
-            width: 100%;
-            padding: 10px;
-            background-color: #111;
-            color: var(--text-main);
-            border: 1px solid #555;
-            font-family: 'Roboto', sans-serif;
-            font-size: 16px;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23b22222%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px top 50%;
-            background-size: 12px auto;
-            border-radius: 4px;
-            transition: border-color 0.3s;
-        }
-
-        select:hover, select:focus {
-            border-color: var(--hunt-red);
-            outline: none;
         }
 
         /* 生成按钮 */
@@ -249,6 +226,18 @@
             letter-spacing: 1px;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+        }
+
+        /* 分类小计价格样式 */
+        .sub-cost {
+            color: var(--money-green);
+            font-weight: bold;
+            font-size: 13px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 10px;
         }
 
         .section-content {
@@ -263,7 +252,7 @@
             font-size: 18px;
             font-family: 'Georgia', serif;
             display: flex;
-            justify-content: space-between; /* 名字和价格两端对齐 */
+            justify-content: space-between;
             align-items: center;
             transition: all 0.2s;
             box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
@@ -279,14 +268,12 @@
             transform: translateX(5px);
         }
         
-        /* 价格标签样式 */
         .price-tag {
             font-family: 'Roboto Mono', monospace;
             font-size: 14px;
             color: #666;
         }
 
-        /* 特殊文字颜色 */
         .quartermaster {
             color: var(--gold-accent);
             font-weight: bold;
@@ -391,16 +378,14 @@
                 <label><input type="checkbox" id="doConsumables" checked> <span id="lbl_cons">随机消耗品</span></label>
             </div>
 
-            <!-- 模块 2：栏位配置 -->
+            <!-- 模块 2：栏位配置 (改为多选) -->
             <div class="control-group">
-                <div class="control-title" id="lbl_slot_config">武器槽位组合</div>
-                <select id="slotConfig">
-                    <option value="3+1" id="opt_31">3 + 1 (大槽 + 小槽)</option>
-                    <option value="3+2" id="opt_32">3 + 2 (大槽 + 中槽 / 军需官)</option>
-                    <option value="2+2" id="opt_22">2 + 2 (中槽 + 中槽)</option>
-                    <option value="2+1" id="opt_21">2 + 1 (中槽 + 小槽)</option>
-                    <option value="1+1" id="opt_11">1 + 1 (小槽 + 小槽)</option>
-                </select>
+                <div class="control-title" id="lbl_slot_config">允许的槽位组合 (多选)</div>
+                <label><input type="checkbox" id="cfg_31" value="3+1" checked> <span id="opt_31">3 + 1 (大槽 + 小槽)</span></label>
+                <label><input type="checkbox" id="cfg_32" value="3+2" checked> <span id="opt_32">3 + 2 (大槽 + 中槽)</span></label>
+                <label><input type="checkbox" id="cfg_22" value="2+2"> <span id="opt_22">2 + 2 (中槽 + 中槽)</span></label>
+                <label><input type="checkbox" id="cfg_21" value="2+1"> <span id="opt_21">2 + 1 (中槽 + 小槽)</span></label>
+                <label><input type="checkbox" id="cfg_11" value="1+1"> <span id="opt_11">1 + 1 (小槽 + 小槽)</span></label>
             </div>
 
             <!-- 模块 3：其他规则 -->
@@ -429,7 +414,11 @@
             <!-- 武器 -->
             <div class="section">
                 <div class="section-header">
-                    <span id="h_weap">WEAPONS</span>
+                    <div>
+                        <span id="h_weap">WEAPONS</span>
+                        <!-- 武器总价 -->
+                        <span id="weapCost" class="sub-cost">$0</span>
+                    </div>
                     <span>///</span>
                 </div>
                 <div class="section-content">
@@ -446,7 +435,11 @@
             <!-- 工具 -->
             <div class="section">
                 <div class="section-header">
-                    <span id="h_tool">TOOLS</span>
+                    <div>
+                        <span id="h_tool">TOOLS</span>
+                        <!-- 工具总价 -->
+                        <span id="toolCost" class="sub-cost">$0</span>
+                    </div>
                     <span>///</span>
                 </div>
                 <div class="section-content" id="toolsList"></div>
@@ -455,13 +448,17 @@
             <!-- 消耗品 -->
             <div class="section">
                 <div class="section-header">
-                    <span id="h_cons">CONSUMABLES</span>
+                    <div>
+                        <span id="h_cons">CONSUMABLES</span>
+                        <!-- 消耗品总价 -->
+                        <span id="consCost" class="sub-cost">$0</span>
+                    </div>
                     <span>///</span>
                 </div>
                 <div class="section-content" id="consumablesList"></div>
             </div>
 
-            <!-- 总价格 (新增) -->
+            <!-- 总价格 -->
             <div class="total-panel">
                 <span class="total-label" id="lbl_total">TOTAL COST</span>
                 <span class="total-value" id="totalCostValue">$0</span>
@@ -479,6 +476,6 @@
         </a>
     </footer>
 
-    <script src="logic.js?v=2.0"></script>
+    <script src="logic.js"></script>
 </body>
 </html>

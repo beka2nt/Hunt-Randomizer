@@ -10,7 +10,7 @@ const uiText = {
         tool: "随机工具",
         cons: "随机消耗品",
         
-        slot_config: "武器槽位组合",
+        slot_config: "允许的槽位组合 (多选)",
         opt_31: "3 + 1 (大槽 + 小槽)",
         opt_32: "3 + 2 (大槽 + 中槽 / 军需官)",
         opt_22: "2 + 2 (中槽 + 中槽)",
@@ -27,7 +27,7 @@ const uiText = {
         h_cons: "消耗品",
         
         no_trait: "无特殊特质要求",
-        qm_trait: "★ 建议携带：军需官 (Quartermaster) ★",
+        qm_trait: "★ 必须携带：军需官 (Quartermaster) ★",
         
         slot_large: "主武器 (Large Slot)",
         slot_medium: "中槽武器 (Medium Slot)",
@@ -44,7 +44,7 @@ const uiText = {
         tool: "Random Tools",
         cons: "Random Consumables",
 
-        slot_config: "Slot Configuration",
+        slot_config: "Allowed Configurations (Multi-select)",
         opt_31: "3 + 1 (Large + Small)",
         opt_32: "3 + 2 (Large + Medium / Quartermaster)",
         opt_22: "2 + 2 (Medium + Medium)",
@@ -61,7 +61,7 @@ const uiText = {
         h_cons: "Consumables",
         
         no_trait: "No specific traits required",
-        qm_trait: "★ Recommended: Quartermaster ★",
+        qm_trait: "★ Required: Quartermaster ★",
         
         slot_large: "PRIMARY (Large Slot)",
         slot_medium: "MEDIUM SLOT",
@@ -148,22 +148,41 @@ function generateLoadout() {
     if (!gameData) return;
     const t = uiText[currentLang];
 
-    const slotConfig = document.getElementById('slotConfig').value; 
+    // 获取规则
     const forceMed = document.getElementById('forceMedkit').checked;
     const forceMel = document.getElementById('forceMelee').checked;
     const enableTools = document.getElementById('doTools').checked;
     const enableCons = document.getElementById('doConsumables').checked;
 
-    let totalCost = 0; // 总价初始化
+    // 分类总价初始化
+    let subCostWeap = 0;
+    let subCostTool = 0;
+    let subCostCons = 0;
 
-    // 1. 武器逻辑
+    // 1. 武器逻辑 (支持多选)
+    // 收集所有勾选的配置
+    let allowedConfigs = [];
+    if(document.getElementById('cfg_31').checked) allowedConfigs.push("3+1");
+    if(document.getElementById('cfg_32').checked) allowedConfigs.push("3+2");
+    if(document.getElementById('cfg_22').checked) allowedConfigs.push("2+2");
+    if(document.getElementById('cfg_21').checked) allowedConfigs.push("2+1");
+    if(document.getElementById('cfg_11').checked) allowedConfigs.push("1+1");
+
+    // 如果一个都没选，默认给一个 3+1
+    if (allowedConfigs.length === 0) {
+        allowedConfigs.push("3+1");
+    }
+
+    // 从允许的配置里随机抽一个
+    const chosenConfig = getRandomItem(allowedConfigs);
+
     let primaryObj = null;
     let secondaryObj = null;
     let traitDisplay = t.no_trait;
     let labelPrimary = "";
     let labelSecondary = "";
 
-    switch (slotConfig) {
+    switch (chosenConfig) {
         case "3+1":
             primaryObj = getRandomItem(gameData.weaponsLarge);
             secondaryObj = getRandomItem(gameData.weaponsSmall);
@@ -182,7 +201,7 @@ function generateLoadout() {
             secondaryObj = getRandomItem(gameData.weaponsMedium);
             labelPrimary = t.slot_medium;
             labelSecondary = t.slot_medium;
-            traitDisplay = `<span class='quartermaster'>${t.qm_trait}</span>`;
+            // 2+2 不需要军需官，这里保持 no_trait
             break;
         case "2+1":
             primaryObj = getRandomItem(gameData.weaponsMedium);
@@ -199,8 +218,8 @@ function generateLoadout() {
     }
 
     // 累加武器价格
-    totalCost += (primaryObj.price || 0);
-    totalCost += (secondaryObj.price || 0);
+    subCostWeap += (primaryObj.price || 0);
+    subCostWeap += (secondaryObj.price || 0);
 
     // 2. 工具逻辑
     const toolsDiv = document.getElementById('toolsList');
@@ -234,11 +253,12 @@ function generateLoadout() {
         
         // 渲染并累加价格
         toolsDiv.innerHTML = selectedTools.map(item => {
-            totalCost += (item.price || 0);
+            subCostTool += (item.price || 0);
             return `<div class="item">${renderItem(item)}</div>`;
         }).join('');
     } else {
         toolsDiv.innerHTML = `<div class="sub-text">${t.disabled}</div>`;
+        subCostTool = 0;
     }
 
     // 3. 消耗品逻辑
@@ -251,15 +271,24 @@ function generateLoadout() {
         
         // 渲染并累加价格
         consDiv.innerHTML = selectedCons.map(item => {
-            totalCost += (item.price || 0);
+            subCostCons += (item.price || 0);
             return `<div class="item">${renderItem(item)}</div>`;
         }).join('');
     } else {
         consDiv.innerHTML = `<div class="sub-text">${t.disabled}</div>`;
+        subCostCons = 0;
     }
 
-    // 4. 渲染结果
+    // 4. 计算总价
+    const totalCost = subCostWeap + subCostTool + subCostCons;
+
+    // 5. 渲染结果
     document.getElementById('traitResult').innerHTML = traitDisplay;
+    
+    // 更新分类价格显示
+    document.getElementById('weapCost').innerText = `$${subCostWeap}`;
+    document.getElementById('toolCost').innerText = `$${subCostTool}`;
+    document.getElementById('consCost').innerText = `$${subCostCons}`;
     
     document.getElementById('primarySlotLabel').innerText = labelPrimary;
     document.getElementById('primaryWeapon').innerHTML = renderItem(primaryObj);
